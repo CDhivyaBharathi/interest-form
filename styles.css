@@ -226,9 +226,11 @@ h3 { font-weight: 600; font-size: 1.25rem; line-height: 1.35; margin: 0; }
 }
 .card p { color: var(--text-secondary); font-size: 15px; margin: 8px 0 12px; }
 .card ul { margin: 0 0 16px; padding-left: 18px; font-size: 14px; color: var(--text-secondary); }
+.card-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .card-link {
-  margin-top: auto; align-self: flex-start; background: none; border: none; padding: 0;
+  background: none; border: none; padding: 0;
   font: inherit; font-size: 14px; font-weight: 600; color: var(--text-link); cursor: pointer;
+  text-decoration: none;
 }
 .card-link:hover { text-decoration: underline; }
 
@@ -239,6 +241,7 @@ h3 { font-weight: 600; font-size: 1.25rem; line-height: 1.35; margin: 0; }
 .callout {
   background: var(--bg-warm); border-left: 3px solid var(--brick-700);
   padding: 16px; font-size: 15px; border-radius: var(--radius-sm);
+  margin-top: 20px;
 }
 
 .form-card { background: var(--white); border: 1px solid var(--border-default); border-radius: var(--radius-md); padding: 24px; }

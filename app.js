@@ -9,27 +9,28 @@ const CONFIG = {
       id: "projects",
       tag: "Make + Build",
       title: "Projects",
-      summary: "Make, build, and work on real projects with a team, taking an idea from a rough first version to something that works. Bring your own idea or jump into one that's already underway.",
-      details: [
-        "Work alongside other makers",
-        "Curiosity matters more than experience",
-      ],
+      summary: "Build real things with a team. Bring an idea or join one.",
+      details: [],
     },
     {
       id: "vishwakarma-awards",
-      tag: "New here? Start here",
+      tag: "Beginner-friendly",
       isNew: true,
       title: "Vishwakarma Awards",
-      summary: "Help us run the hackathon from the front row.",
+      summary: "India's national hardware challenge for student teams, with Ashoka as one of three mentor institutes. Help us support the teams from the front row as they build their prototypes.",
       details: [],
+      moreInfo: "https://www.vishwakarma-awards.org/#viswakarma-awards",
     },
     {
       id: "redbrick-hacks",
-      tag: "New here? Start here",
+      tag: "Beginner-friendly",
       isNew: true,
       title: "RedBrick Hacks",
-      summary: "Get a backstage pass. Help us bring RedBrick Hacks together, from the first prep to the big day.",
-      details: [],
+      summary: "Our 48-hour hackathon on problems real India faces. The last edition drew 430+ applicants from 91+ universities across 23 states.",
+      details: [
+        "Work across verticals: operations, hardware support, participant help, side events and outreach",
+        "Get a backstage pass to one of our biggest events",
+      ],
     },
   ],
 };
@@ -114,12 +115,18 @@ CONFIG.opportunities.forEach((opp) => {
     opp.details.forEach((d) => ul.append(el("li", {}, d)));
     card.append(ul);
   }
-  const btn = el("button", { type: "button", class: "card-link" }, "I'm interested →");
-  btn.addEventListener("click", () => {
-    document.getElementById("opp-" + opp.id).checked = true;
-    scrollToSection("interest-form");
-  });
-  card.append(btn);
+  if (opp.moreInfo) {
+    const actions = el("div", { class: "card-actions" });
+    // Opens the event's own site in a new tab; noopener stops that site controlling this page.
+    actions.append(el("a", {
+      class: "card-link card-link-ext",
+      href: opp.moreInfo,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      "aria-label": "Learn more about " + opp.title + " (opens in a new tab)",
+    }, "Learn more ↗"));
+    card.append(actions);
+  }
   grid.append(card);
 });
 

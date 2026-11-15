@@ -51,10 +51,7 @@
     <div class="container">
       <p class="eyebrow eyebrow-on-brand">Mphasis AI &amp; Applied Tech Lab</p>
       <h1>Volunteer at the Makerspace.</h1>
-      <p class="hero-lead">
-        The Makerspace runs on people who like making things and helping others make them too.
-        Read through the interest pools, then tell us which ones you'd like to join.
-      </p>
+      <p class="hero-lead">Make things. Help others make them too.</p>
       <p class="hero-note">
         This is an expression of interest only. Filling the form does not confirm you as a volunteer.
       </p>
@@ -69,15 +66,12 @@
     <div class="container">
       <p class="eyebrow">01 Interest pools</p>
       <h2>Ways to volunteer</h2>
-      <p class="section-lead">
-        Volunteering at the Makerspace can take a few different forms. Read through the pools below
-        and join as many as you like in the form. New here? The event pools are a great place to start.
-      </p>
+      <p class="section-lead">Join as many as you like. New here? Check out our events.</p>
 
       <div class="card-grid" id="opportunity-cards"></div>
 
       <div class="skills">
-        <p class="skills-label">Whichever pool you pick, the community will get you up to speed on all of it</p>
+        <p class="skills-label">Whichever you pick, we'll get you up to speed</p>
         <ul class="skills-list">
           <li>Embedded systems</li>
           <li>CAD</li>
@@ -95,9 +89,6 @@
       <div>
         <p class="eyebrow">02 Register interest</p>
         <h2>Tell us you're interested</h2>
-        <p class="section-lead">
-          We'll use this to see how many people are interested in each pool and plan around it.
-        </p>
         <div class="callout" role="note">
           <strong>Please note:</strong> filling this form <strong>does not confirm your participation</strong>
           as a volunteer at the Makerspace. It is only to gauge interest. We'll get in touch
@@ -134,8 +125,7 @@
         </div>
 
         <fieldset class="field">
-          <legend>Which interest pools would you like to join?</legend>
-          <p class="hint">Pick as many as you like.</p>
+          <legend>Interest pools <span class="optional">(pick any)</span></legend>
           <div id="opportunity-options" class="checkbox-list"></div>
           <p class="error" id="opportunities-error"></p>
         </fieldset>
@@ -151,16 +141,14 @@
         </button>
         <div class="status" id="status" role="status" aria-live="polite"></div>
         <p class="fine-print privacy-note">
-          <strong>Privacy:</strong> your name, email, batch and answers are only seen by the Makerspace team,
-          and are only used to contact you about volunteering.
+          Only the Makerspace team sees your answers.
         </p>
       </form>
 
       <!-- Shown in place of the form after a successful submission. -->
       <div id="thanks" class="form-card thanks" tabindex="-1" hidden>
         <p class="eyebrow">Submitted</p>
-        <h3>Thank you for submitting, <span id="thanks-name"></span>!</h3>
-        <p>Your interest has been recorded.</p>
+        <h3>Thanks, <span id="thanks-name"></span>!</h3>
         <p class="thanks-note">
           This does not confirm your participation as a volunteer at the Makerspace.
           We'll reach out if there's a next step.
