@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!--
+    Security policy: the browser may only load this site's own files, Google Fonts,
+    and send form data to the Apps Script. Anything else (e.g. injected scripts) is blocked.
+    If you add a new external service, add its address here.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Volunteer Interest · Makerspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Open+Sans:wght@400;600;700&family=Zilla+Slab:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <div class="container nav-inner">
+      <p class="brand"><img class="brand-mark" src="assets/makerspace-mark.png" alt="" width="37" height="32"><span class="wordmark">Makerspace</span></p>
+      <nav class="nav-links" aria-label="Page sections">
+        <button type="button" data-scroll="opportunities">Interest pools</button>
+        <button type="button" data-scroll="interest-form" class="active">Register interest</button>
+      </nav>
+      <!-- Phones: menu button that opens the side drawer -->
+      <button type="button" class="menu-btn" id="menu-open"
+              aria-label="Open menu" aria-expanded="false" aria-controls="drawer">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
+  <aside class="drawer" id="drawer" aria-label="Menu" aria-hidden="true">
+    <div class="drawer-head">
+      <p class="brand"><img class="brand-mark" src="assets/makerspace-mark.png" alt="" width="37" height="32"><span class="wordmark">Makerspace</span></p>
+      <button type="button" class="drawer-close" id="menu-close" aria-label="Close menu">&times;</button>
+    </div>
+    <nav class="drawer-links" aria-label="Page sections">
+      <button type="button" data-scroll="opportunities">Interest pools</button>
+      <button type="button" data-scroll="interest-form">Register interest</button>
+    </nav>
+    <p class="drawer-foot">Mphasis AI &amp; Applied Tech Lab · Ashoka University</p>
+  </aside>
+
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow eyebrow-on-brand">Mphasis AI &amp; Applied Tech Lab</p>
+      <h1>Volunteer at the Makerspace.</h1>
+      <p class="hero-lead">
+        The Makerspace runs on people who like making things and helping others make them too.
+        Read through the interest pools, then tell us which ones you'd like to join.
+      </p>
+      <p class="hero-note">
+        This is an expression of interest only. Filling the form does not confirm you as a volunteer.
+      </p>
+      <div class="hero-actions">
+        <button type="button" class="btn btn-on-brand" data-scroll="opportunities">See interest pools</button>
+        <button type="button" class="btn btn-on-brand-outline" data-scroll="interest-form">Register interest</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="opportunities" class="section">
+    <div class="container">
+      <p class="eyebrow">01 Interest pools</p>
+      <h2>Ways to volunteer</h2>
+      <p class="section-lead">
+        Volunteering at the Makerspace can take a few different forms. Read through the pools below
+        and join as many as you like in the form. New here? The event pools are a great place to start.
+      </p>
+
+      <div class="card-grid" id="opportunity-cards"></div>
+
+      <div class="skills">
+        <p class="skills-label">What you can pick up along the way</p>
+        <ul class="skills-list">
+          <li>Embedded systems</li>
+          <li>CAD</li>
+          <li>3D printing</li>
+          <li>Woodworking</li>
+          <li>Fabrics &amp; textiles</li>
+          <li>and more</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="interest-form" class="section section-surface">
+    <div class="container form-layout">
+      <div>
+        <p class="eyebrow">02 Register interest</p>
+        <h2>Tell us you're interested</h2>
+        <p class="section-lead">
+          We'll use this to see how many people are interested in each pool and plan around it.
+        </p>
+        <div class="callout" role="note">
+          <strong>Please note:</strong> filling this form <strong>does not confirm your participation</strong>
+          as a volunteer at the Makerspace. It is only to gauge interest. We'll get in touch
+          if and when there's a next step.
+        </div>
+      </div>
+
+      <form id="signup-form" class="form-card" novalidate>
+        <div class="field">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required>
+          <p class="error" id="name-error"></p>
+        </div>
+
+        <div class="field">
+          <label for="email">Ashoka email ID</label>
+          <input id="email" name="email" type="email" autocomplete="email"
+                 placeholder="yourname@ashoka.edu.in" required>
+          <p class="error" id="email-error"></p>
+        </div>
+
+        <!-- Hidden from people; spam bots tend to fill it in. -->
+        <div class="hp" aria-hidden="true">
+          <label for="website">Leave this empty</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label for="batch">Undergraduate batch</label>
+          <select id="batch" name="batch" required>
+            <option value="">Select your batch</option>
+          </select>
+          <p class="error" id="batch-error"></p>
+        </div>
+
+        <fieldset class="field">
+          <legend>Which interest pools would you like to join?</legend>
+          <p class="hint">Pick as many as you like.</p>
+          <div id="opportunity-options" class="checkbox-list"></div>
+          <p class="error" id="opportunities-error"></p>
+        </fieldset>
+
+        <div class="field">
+          <label for="learn">What would you like to learn? <span class="optional">(optional)</span></label>
+          <textarea id="learn" name="learn" rows="3" maxlength="500"></textarea>
+        </div>
+
+        <p class="fine-print">
+          Submitting this form does not confirm your participation as a volunteer. It is only to gauge interest.
+        </p>
+        <p class="fine-print">
+          <strong>Privacy:</strong> your name, email, batch and answers are only seen by the Makerspace team,
+          and are only used to contact you about volunteering.
+        </p>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="spinner" aria-hidden="true"></span>
+          <span class="btn-label">Submit interest</span>
+        </button>
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+      </form>
+
+      <!-- Shown in place of the form after a successful submission. -->
+      <div id="thanks" class="form-card thanks" tabindex="-1" hidden>
+        <p class="eyebrow">Submitted</p>
+        <h3>Thank you for submitting, <span id="thanks-name"></span>!</h3>
+        <p>Your interest has been recorded.</p>
+        <p class="thanks-note">
+          This does not confirm your participation as a volunteer at the Makerspace.
+          We'll reach out if there's a next step.
+        </p>
+        <button type="button" class="link-btn" id="submit-another">Submit another response</button>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="lockup">
+          <span class="mark-chip"><img src="assets/makerspace-mark.png" alt="" width="30" height="26"></span>
+          <div>
+            <p class="wordmark wordmark-inverse">Makerspace</p>
+            <p class="lockup-sub">Mphasis AI &amp; Applied Tech Lab · Ashoka University</p>
+          </div>
+        </div>
+        <p class="footer-blurb">Tools, people, and room to learn by making.</p>
+      </div>
+      <div>
+        <p class="footer-heading">Visit or write</p>
+        <p><a href="mailto:makerspace@ashoka.edu.in">makerspace@ashoka.edu.in</a></p>
+        <p>AC06, 3rd Floor, Innovation Centre</p>
+        <p>Ashoka University, Sonipat</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© 2026 Makerspace at Ashoka University</span>
+      <span>Measure twice. Make something odd.</span>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+// ---- Setup + content ----
+const CONFIG = {
+  // Apps Script web app URL, ending in /exec (see README). Students never see it.
+  submitUrl: "https://script.google.com/macros/s/AKfycbzz6NiS4VArmZyizV4fnVSXtK3Zxr1uEocoisSnBEROBcNz_uFj77jVzohKRMyj8HJh/exec",
+  emailDomain: "ashoka.edu.in",
+  batches: ["UG26", "UG27", "UG28", "UG29"],
+  opportunities: [
+    {
+      id: "projects",
+      tag: "Make + Build",
+      title: "Projects",
+      summary: "Make, build, and work on real projects with a team, taking an idea from a rough first version to something that works. Bring your own idea or jump into one that's already underway.",
+      details: [
+        "Work alongside other makers",
+        "Curiosity matters more than experience",
+      ],
+    },
+    {
+      id: "vishwakarma-awards",
+      tag: "New here? Start here",
+      isNew: true,
+      title: "Vishwakarma Awards",
+      summary: "Help us run the hackathon from the front row.",
+      details: [],
+    },
+    {
+      id: "redbrick-hacks",
+      tag: "New here? Start here",
+      isNew: true,
+      title: "RedBrick Hacks",
+      summary: "Get a backstage pass. Help us bring RedBrick Hacks together, from the first prep to the big day.",
+      details: [],
+    },
+  ],
+};
+
+// ---- Sending the response to the Apps Script → Google Sheet ----
+async function submitInterest(data) {
+  if (!CONFIG.submitUrl) {
+    throw new Error("This form isn't connected to the responses sheet yet.");
+  }
+  // text/plain avoids a CORS preflight, which Apps Script web apps don't answer.
+  const res = await fetch(CONFIG.submitUrl, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(data),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok || !body.ok) throw new Error(body.error || "Something went wrong. Please try again.");
+  return body;
+}
+
+const form = document.getElementById("signup-form");
+const statusEl = document.getElementById("status");
+
+function el(tag, attrs, text) {
+  const node = document.createElement(tag);
+  Object.entries(attrs || {}).forEach(([k, v]) => node.setAttribute(k, v));
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function scrollToSection(id) {
+  document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+}
+
+// ---- Mobile side drawer ----
+const drawer = document.getElementById("drawer");
+const backdrop = document.getElementById("drawer-backdrop");
+const menuOpen = document.getElementById("menu-open");
+
+function setDrawer(open) {
+  if (open) {
+    backdrop.hidden = false;
+    void backdrop.offsetWidth; // apply the un-hide first so the fade-in animates
+  }
+  drawer.classList.toggle("is-open", open);
+  backdrop.classList.toggle("is-open", open);
+  drawer.setAttribute("aria-hidden", String(!open));
+  menuOpen.setAttribute("aria-expanded", String(open));
+  document.body.classList.toggle("drawer-locked", open);
+  if (open) {
+    drawer.querySelector(".drawer-links button").focus({ preventScroll: true });
+  } else {
+    setTimeout(() => { if (!drawer.classList.contains("is-open")) backdrop.hidden = true; }, 260);
+  }
+}
+
+menuOpen.addEventListener("click", () => setDrawer(true));
+document.getElementById("menu-close").addEventListener("click", () => { setDrawer(false); menuOpen.focus(); });
+backdrop.addEventListener("click", () => setDrawer(false));
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && drawer.classList.contains("is-open")) { setDrawer(false); menuOpen.focus(); }
+});
+// If the screen is widened past phone size, make sure the drawer isn't left open.
+matchMedia("(min-width: 720px)").addEventListener("change", (e) => { if (e.matches) setDrawer(false); });
+
+document.querySelectorAll("[data-scroll]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (drawer.contains(btn)) setDrawer(false);
+    scrollToSection(btn.dataset.scroll);
+  });
+});
+
+// Opportunity cards
+const grid = document.getElementById("opportunity-cards");
+CONFIG.opportunities.forEach((opp) => {
+  const card = el("article", { class: "card" });
+  card.append(el("span", { class: opp.isNew ? "tag tag-new" : "tag" }, opp.tag));
+  card.append(el("h3", {}, opp.title));
+  [].concat(opp.summary).filter(Boolean).forEach((para) => card.append(el("p", {}, para)));
+  if (opp.details && opp.details.length) {
+    const ul = el("ul");
+    opp.details.forEach((d) => ul.append(el("li", {}, d)));
+    card.append(ul);
+  }
+  const btn = el("button", { type: "button", class: "card-link" }, "I'm interested →");
+  btn.addEventListener("click", () => {
+    document.getElementById("opp-" + opp.id).checked = true;
+    scrollToSection("interest-form");
+  });
+  card.append(btn);
+  grid.append(card);
+});
+
+// Form options
+CONFIG.batches.forEach((b) => form.elements.batch.append(el("option", { value: b }, b)));
+const list = document.getElementById("opportunity-options");
+CONFIG.opportunities.forEach((opp) => {
+  const label = el("label", { class: "checkbox", for: "opp-" + opp.id });
+  const input = el("input", { type: "checkbox", id: "opp-" + opp.id, name: "opportunities", value: opp.id });
+  label.append(input, document.createTextNode(opp.title));
+  list.append(label);
+});
+
+function showStatus(kind, ...nodes) {
+  statusEl.className = "status " + kind;
+  statusEl.replaceChildren(...nodes);
+}
+
+function setError(field, message) {
+  document.getElementById(field + "-error").textContent = message;
+  const input = form.elements[field];
+  if (input && input.classList) input.classList.toggle("invalid", Boolean(message));
+}
+
+function emailError(email) {
+  const suffix = "@" + CONFIG.emailDomain;
+  if (!email) return "Please enter your Ashoka email ID.";
+  if (!email.endsWith(suffix) || !/^[^\s@]+@[^\s@]+$/.test(email)) {
+    return "That's not a valid Ashoka email ID. Please use your @" + CONFIG.emailDomain + " address.";
+  }
+  return "";
+}
+
+// Show the email error as soon as they leave the field, and clear it once fixed.
+const emailInput = form.elements.email;
+emailInput.addEventListener("blur", () => {
+  const value = emailInput.value.trim().toLowerCase();
+  if (value) setError("email", emailError(value));
+});
+emailInput.addEventListener("input", () => {
+  if (!emailError(emailInput.value.trim().toLowerCase())) setError("email", "");
+});
+
+function validate(data) {
+  const errors = {
+    name: data.name ? "" : "Please enter your name.",
+    batch: data.batch ? "" : "Please select your batch.",
+    email: "",
+    opportunities: data.opportunities.length ? "" : "Please pick at least one interest pool.",
+  };
+  errors.email = emailError(data.email);
+  Object.entries(errors).forEach(([field, msg]) => setError(field, msg));
+  return Object.values(errors).every((m) => !m);
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  statusEl.replaceChildren();
+  statusEl.className = "status";
+
+  const data = {
+    name: form.elements.name.value.trim(),
+    email: form.elements.email.value.trim().toLowerCase(),
+    batch: form.elements.batch.value,
+    opportunities: [...form.querySelectorAll('input[name="opportunities"]:checked')].map((i) => i.value),
+    learn: form.elements.learn.value.trim(),
+  };
+
+  if (!validate(data)) {
+    const firstError = form.querySelector(".error:not(:empty)");
+    if (firstError) firstError.scrollIntoView({ block: "center" });
+    return;
+  }
+
+  const button = form.querySelector("button[type=submit]");
+  const label = button.querySelector(".btn-label");
+  const setSending = (sending) => {
+    button.disabled = sending;
+    button.classList.toggle("is-loading", sending);
+    button.setAttribute("aria-busy", String(sending));
+    label.textContent = sending ? "Submitting…" : "Submit interest";
+  };
+  setSending(true);
+
+  const titles = Object.fromEntries(CONFIG.opportunities.map((o) => [o.id, o.title]));
+  try {
+    await submitInterest({
+      ...data,
+      opportunities: data.opportunities.map((id) => titles[id]),
+      website: form.elements.website.value,
+    });
+    form.reset();
+    showThanks(data.name);
+  } catch (err) {
+    showStatus("fail", document.createTextNode(err.message || "Something went wrong. Please try again."));
+  } finally {
+    setSending(false);
+  }
+});
+
+// ---- Thank-you panel ----
+const thanks = document.getElementById("thanks");
+
+function showThanks(name) {
+  document.getElementById("thanks-name").textContent = name.split(" ")[0] || name;
+  form.hidden = true;
+  thanks.hidden = false;
+  thanks.focus({ preventScroll: true });
+  thanks.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+document.getElementById("submit-another").addEventListener("click", () => {
+  statusEl.replaceChildren();
+  statusEl.className = "status";
+  thanks.hidden = true;
+  form.hidden = false;
+  form.elements.name.focus();
+});
