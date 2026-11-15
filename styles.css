@@ -287,11 +287,7 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--b
   background: var(--bg-warm); border-left: 3px solid var(--brick-700);
   padding: 12px 16px; font-size: 14px; border-radius: var(--radius-sm);
 }
-.link-btn {
-  background: none; border: none; padding: 0; margin-top: 4px;
-  font: inherit; font-size: 14px; font-weight: 600; color: var(--text-link);
-  text-decoration: underline; cursor: pointer;
-}
+.privacy-note { margin: 16px 0 0; }
 .status.fail { color: var(--red-600); }
 
 /* Footer */

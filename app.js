@@ -230,11 +230,3 @@ function showThanks(name) {
   thanks.focus({ preventScroll: true });
   thanks.scrollIntoView({ behavior: "smooth", block: "center" });
 }
-
-document.getElementById("submit-another").addEventListener("click", () => {
-  statusEl.replaceChildren();
-  statusEl.className = "status";
-  thanks.hidden = true;
-  form.hidden = false;
-  form.elements.name.focus();
-});
