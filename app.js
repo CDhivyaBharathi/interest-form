@@ -20,18 +20,28 @@ const CONFIG = {
   opportunities: [
     {
       id: "projects",
-      tag: "Make + Build",
+      tag: "Any skill level",
       title: "Projects",
-      summary: "Build real things with a team. Bring an idea or join one.",
-      details: [],
+      summary: "Spend the break building with the Makerspace team. Join a project we're running, pitch your own, or help build the space itself.",
+      details: [
+        "Join ongoing Makerspace builds, or bring an idea and we'll help you scope it and find teammates",
+        "Make the space better: quick quality-of-life builds like jigs, storage, signage and tool stations",
+        "Get under the hood of how the Makerspace runs and contribute to its core systems, like machine maintenance and calibration, inventory and parts tracking, or the space's network and IT, based on what interests you",
+        "Help grow the community around the space",
+      ],
     },
     {
       id: "vishwakarma-awards",
       tag: "Beginner-friendly",
       isNew: true,
       title: "Vishwakarma Awards",
-      summary: "India's national hardware challenge for student teams, with Ashoka as one of three mentor institutes. Help us support the teams from the front row as they build their prototypes.",
-      details: [],
+      summary: "India's national hardware challenge for student teams, with Ashoka as one of three mentor institutes. This winter, teams build their prototypes on campus at the Makerspace. Work alongside them as their ideas become working hardware.",
+      details: [
+        "Hands-on build help: fabrication, electronics, 3D printing and debugging with the teams",
+        "Run things on campus: setup, schedules and logistics",
+        "Be the go-to person for a few teams, tracking progress and flagging what they need",
+        "Document the builds through photos, video and write-ups",
+      ],
       moreInfo: "https://www.vishwakarma-awards.org/#viswakarma-awards",
     },
     {
@@ -39,9 +49,10 @@ const CONFIG = {
       tag: "Beginner-friendly",
       isNew: true,
       title: "RedBrick Hacks",
-      summary: "Our 48-hour hackathon on problems real India faces. The last edition drew 430+ applicants from 91+ universities across 23 states.",
+      summary: "Our 48-hour hackathon on problems India actually faces comes back next semester, and winter is when it gets built. The last edition drew 430+ applicants from 91+ universities across 23 states.",
       details: [
-        "Work across verticals: operations, hardware support, participant help, side events and outreach",
+        "Shape the next edition: problem statements, sponsors, outreach and logistics planning",
+        "Own a vertical through to event day: operations, hardware support, participant help, side events or outreach",
         "Get a backstage pass to one of our biggest events",
       ],
     },
