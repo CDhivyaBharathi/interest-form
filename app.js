@@ -4,7 +4,7 @@ const CONFIG = {
   submitUrl: "https://script.google.com/macros/s/AKfycbzz6NiS4VArmZyizV4fnVSXtK3Zxr1uEocoisSnBEROBcNz_uFj77jVzohKRMyj8HJh/exec",
   emailDomain: "ashoka.edu.in",
   googleClientId: "471004505922-os27hddhm5qo6139km6s7sir1k99j1pn.apps.googleusercontent.com",
-  batches: ["UG26", "UG27", "UG28", "UG29"],
+  batches: ["UG2023", "UG2024", "UG2025", "UG2026"],
   // From ashoka.edu.in/programme/majors and /interdisciplinary-majors (checked 2026-11-16).
   // Majors are declared at the end of semester 3, so first-years need the "not yet" option.
   majors: [
