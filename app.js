@@ -3,7 +3,20 @@ const CONFIG = {
   // Apps Script web app URL, ending in /exec (see README). Students never see it.
   submitUrl: "https://script.google.com/macros/s/AKfycbzz6NiS4VArmZyizV4fnVSXtK3Zxr1uEocoisSnBEROBcNz_uFj77jVzohKRMyj8HJh/exec",
   emailDomain: "ashoka.edu.in",
+  googleClientId: "471004505922-os27hddhm5qo6139km6s7sir1k99j1pn.apps.googleusercontent.com",
   batches: ["UG26", "UG27", "UG28", "UG29"],
+  // From ashoka.edu.in/programme/majors and /interdisciplinary-majors (checked 2026-11-16).
+  // Majors are declared at the end of semester 3, so first-years need the "not yet" option.
+  majors: [
+    "Biology", "Chemistry", "Computer Science", "Computer Science and Artificial Intelligence",
+    "Economics", "English", "History", "International Relations", "Management", "Mathematics",
+    "Philosophy", "Physics", "Political Science", "Psychology", "Sociology/Anthropology",
+    "Computer Science and Entrepreneurial Leadership", "Mathematics and Computer Science",
+    "English and Creative Writing", "Economics and Finance", "Economics and History",
+    "English and Media Studies", "English and Performing Arts", "History and International Relations",
+    "Politics, Philosophy and Economics", "Computer Science and Philosophy", "Economics and Public Policy",
+    "Not declared yet",
+  ],
   opportunities: [
     {
       id: "projects",
@@ -132,6 +145,7 @@ CONFIG.opportunities.forEach((opp) => {
 
 // Form options
 CONFIG.batches.forEach((b) => form.elements.batch.append(el("option", { value: b }, b)));
+CONFIG.majors.forEach((m) => form.elements.major.append(el("option", { value: m }, m)));
 const list = document.getElementById("opportunity-options");
 CONFIG.opportunities.forEach((opp) => {
   const label = el("label", { class: "checkbox", for: "opp-" + opp.id });
@@ -151,33 +165,74 @@ function setError(field, message) {
   if (input && input.classList) input.classList.toggle("invalid", Boolean(message));
 }
 
-function emailError(email) {
-  const suffix = "@" + CONFIG.emailDomain;
-  if (!email) return "Please enter your Ashoka email ID.";
-  if (!email.endsWith(suffix) || !/^[^\s@]+@[^\s@]+$/.test(email)) {
-    return "That's not a valid Ashoka email ID. Please use your @" + CONFIG.emailDomain + " address.";
-  }
-  return "";
+// ---- Google sign-in (Ashoka accounts only) ----
+// Students fill in the form first; the Google button replaces Submit until they're signed in.
+// The page checks the token for UX only. Code.gs verifies `credential` server-side, which is the real check.
+let credential = "";
+let pendingSubmit = false; // a submit is waiting on a fresh token
+const emailInput = form.elements.email;
+const gateError = document.getElementById("gate-error");
+
+function parseToken(jwt) {
+  try {
+    return JSON.parse(decodeURIComponent(escape(atob(jwt.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")))));
+  } catch { return null; }
 }
 
-// Show the email error as soon as they leave the field, and clear it once fixed.
-const emailInput = form.elements.email;
-emailInput.addEventListener("blur", () => {
-  const value = emailInput.value.trim().toLowerCase();
-  if (value) setError("email", emailError(value));
-});
-emailInput.addEventListener("input", () => {
-  if (!emailError(emailInput.value.trim().toLowerCase())) setError("email", "");
+function lock(msg) {
+  credential = "";
+  pendingSubmit = false;
+  emailInput.value = "";
+  try { sessionStorage.removeItem("cred"); } catch {}
+  gateError.textContent = msg || "";
+  document.body.classList.add("locked");
+}
+
+function unlock(jwt) {
+  const p = parseToken(jwt);
+  if (!p || p.hd !== CONFIG.emailDomain || p.email_verified !== true || p.exp * 1000 < Date.now()) return false;
+  credential = jwt;
+  emailInput.value = p.email.toLowerCase();
+  if (!form.elements.name.value) form.elements.name.value = p.name || "";
+  try { sessionStorage.setItem("cred", jwt); } catch {}
+  gateError.textContent = "";
+  document.body.classList.remove("locked");
+  return true;
+}
+
+// select_by "btn*" = they clicked the Google button, so that click means "sign in and submit".
+// Silent sign-ins ("auto", One Tap) only sign in; they never submit a half-filled form.
+function onSignIn({ credential: jwt, select_by: how = "" }) {
+  if (!unlock(jwt)) return lock("Please sign in with your @" + CONFIG.emailDomain + " Google account.");
+  if (pendingSubmit || how.startsWith("btn")) { pendingSubmit = false; form.requestSubmit(); }
+}
+
+// Token missing or expired (they last about an hour): ask Google for a fresh one quietly
+// (auto_select), then carry on submitting. If nothing comes back, fall back to the button.
+function refreshThenSubmit() {
+  lock("");
+  pendingSubmit = true;
+  google.accounts.id.prompt();
+  setTimeout(() => { if (pendingSubmit) lock("Please sign in to submit."); }, 4000);
+}
+
+try { unlock(sessionStorage.getItem("cred") || ""); } catch {}
+
+window.addEventListener("load", () => {
+  google.accounts.id.initialize({
+    client_id: CONFIG.googleClientId, hd: CONFIG.emailDomain, callback: onSignIn, auto_select: true,
+  });
+  google.accounts.id.renderButton(document.getElementById("g-signin"), { theme: "outline", size: "large", text: "signin_with" });
+  if (!credential) google.accounts.id.prompt(); // returning students are signed in without a click
 });
 
 function validate(data) {
   const errors = {
     name: data.name ? "" : "Please enter your name.",
     batch: data.batch ? "" : "Please select your batch.",
-    email: "",
+    major: data.major ? "" : "Please select your major.",
     opportunities: data.opportunities.length ? "" : "Please pick at least one interest pool.",
   };
-  errors.email = emailError(data.email);
   Object.entries(errors).forEach(([field, msg]) => setError(field, msg));
   return Object.values(errors).every((m) => !m);
 }
@@ -189,8 +244,8 @@ form.addEventListener("submit", async (event) => {
 
   const data = {
     name: form.elements.name.value.trim(),
-    email: form.elements.email.value.trim().toLowerCase(),
     batch: form.elements.batch.value,
+    major: form.elements.major.value,
     opportunities: [...form.querySelectorAll('input[name="opportunities"]:checked')].map((i) => i.value),
     learn: form.elements.learn.value.trim(),
   };
@@ -200,6 +255,10 @@ form.addEventListener("submit", async (event) => {
     if (firstError) firstError.scrollIntoView({ block: "center" });
     return;
   }
+
+  // Signed in with a live token? If not, get one first; onSignIn resubmits.
+  const tok = parseToken(credential);
+  if (!tok || tok.exp * 1000 < Date.now()) return refreshThenSubmit();
 
   const button = form.querySelector("button[type=submit]");
   const label = button.querySelector(".btn-label");
@@ -217,6 +276,7 @@ form.addEventListener("submit", async (event) => {
       ...data,
       opportunities: data.opportunities.map((id) => titles[id]),
       website: form.elements.website.value,
+      credential,
     });
     form.reset();
     showThanks(data.name);

@@ -8,7 +8,7 @@
     and send form data to the Apps Script. Anything else (e.g. injected scripts) is blocked.
     If you add a new external service, add its address here.
   -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src https://script.google.com https://script.googleusercontent.com; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' https://fonts.googleapis.com https://accounts.google.com/gsi/style 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://accounts.google.com/gsi/ https://script.google.com https://script.googleusercontent.com; frame-src https://accounts.google.com/gsi/; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Volunteer Interest · Makerspace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +18,7 @@
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="locked">
   <header class="nav">
     <div class="container nav-inner">
       <p class="brand"><img class="brand-mark" src="assets/makerspace-mark.png" alt="" width="37" height="32"><span class="wordmark">Makerspace</span></p>
@@ -103,10 +103,9 @@
           <p class="error" id="name-error"></p>
         </div>
 
-        <div class="field">
+        <div class="field email-field">
           <label for="email">Ashoka email ID</label>
-          <input id="email" name="email" type="email" autocomplete="email"
-                 placeholder="yourname@ashoka.edu.in" required>
+          <input id="email" name="email" type="email" readonly>
           <p class="error" id="email-error"></p>
         </div>
 
@@ -124,6 +123,15 @@
           <p class="error" id="batch-error"></p>
         </div>
 
+        <div class="field">
+          <label for="major">Major</label>
+          <select id="major" name="major" required>
+            <option value="">Select your major</option>
+          </select>
+          <p class="hint">Your major doesn't matter here.</p>
+          <p class="error" id="major-error"></p>
+        </div>
+
         <fieldset class="field">
           <legend>Interest pools <span class="optional">(pick any)</span></legend>
           <div id="opportunity-options" class="checkbox-list"></div>
@@ -133,6 +141,13 @@
         <div class="field">
           <label for="learn">What would you like to learn? <span class="optional">(optional)</span></label>
           <textarea id="learn" name="learn" rows="3" maxlength="500"></textarea>
+        </div>
+
+        <!-- Shown instead of the submit button until an Ashoka Google account signs in. -->
+        <div class="signin-slot">
+          <p class="fine-print">Sign in with your @ashoka.edu.in Google account to submit.</p>
+          <div id="g-signin"></div>
+          <p class="error" id="gate-error" role="alert"></p>
         </div>
 
         <button type="submit" class="btn btn-primary btn-block">
@@ -183,6 +198,7 @@
     </div>
   </footer>
 
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="app.js"></script>
 </body>
 </html>
