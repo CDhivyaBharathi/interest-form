@@ -3,7 +3,7 @@ const CONFIG = {
   // Apps Script web app URL, ending in /exec (see README). Students never see it.
   submitUrl: "https://script.google.com/macros/s/AKfycbzckEzndQ6G2jR0hmmtB9Ri3GRtjzYtxIh7w9F1l5qJ6C-o0iU3UNcP04soNyNq0irl8A/exec",
   emailDomain: "ashoka.edu.in",
-  googleClientId: "471004505922-os27hddhm5qo6139km6s7sir1k99j1pn.apps.googleusercontent.com",
+  googleClientId: "693981333201-4smuu3qcts9cgdut1579o9pkdrvcj9pt.apps.googleusercontent.com",
   batches: ["UG2023", "UG2024", "UG2025", "UG2026"],
   // From ashoka.edu.in/programme/majors and /interdisciplinary-majors (checked 2026-11-16).
   // Majors are declared at the end of semester 3, so first-years need the "not yet" option.
